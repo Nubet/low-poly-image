@@ -27,6 +27,6 @@ install_manifest.txt
 Debug/
 Release/
 
-# Generated output
-output.png
+# Root-level image files are local inputs/outputs, not repository assets.
+/*.png
 output.ppm
