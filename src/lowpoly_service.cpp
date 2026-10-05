@@ -2,6 +2,7 @@
 
 extern "C" {
 #include "arena.h"
+#include "image.h"
 #include "processing.h"
 }
 
@@ -63,6 +64,25 @@ ProcessResponse LowpolyService::process(const ProcessRequest &request) const
                                static_cast<size_t>(response.height) * sizeof(Pixel);
     response.rgb_pixels.assign(pixels, pixels + pixel_bytes);
     return response;
+}
+
+bool LowpolyService::save_png(const ProcessResponse &response, const std::string &path) const
+{
+    if (!response.succeeded() || response.width <= 0 || response.height <= 0 || path.empty())
+        return false;
+
+    const size_t pixel_count = static_cast<size_t>(response.width) *
+                               static_cast<size_t>(response.height);
+    if (response.rgb_pixels.size() != pixel_count * sizeof(Pixel))
+        return false;
+
+    Image image = {
+        .width = response.width,
+        .height = response.height,
+        .pixels = reinterpret_cast<Pixel *>(
+            const_cast<uint8_t *>(response.rgb_pixels.data())),
+    };
+    return image_save_as_png(&image, path.c_str()) != 0;
 }
 
 } // namespace lowpoly

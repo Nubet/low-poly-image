@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cstdint>
+#include <memory>
 #include <random>
 #include <string>
 #include <thread>
@@ -67,6 +68,24 @@ bool choose_input_file(std::string *path)
     return true;
 }
 
+bool choose_output_file(std::string *path)
+{
+    nfdu8char_t *selected_path = nullptr;
+    nfdu8filteritem_t filters[] = {{"PNG image", "png"}};
+    nfdsavedialogu8args_t arguments = {};
+    arguments.filterList = filters;
+    arguments.filterCount = 1;
+    arguments.defaultName = "lowpoly.png";
+
+    const nfdresult_t result = NFD_SaveDialogU8_With(&selected_path, &arguments);
+    if (result != NFD_OKAY)
+        return false;
+
+    *path = selected_path;
+    NFD_FreePathU8(selected_path);
+    return true;
+}
+
 slint::Image make_image(const lowpoly::ProcessResponse &response)
 {
     slint::SharedPixelBuffer<slint::Rgb8Pixel> buffer(response.width, response.height);
@@ -82,6 +101,7 @@ int main()
     auto window = MainWindow::create();
     const bool file_dialog_ready = NFD_Init() == NFD_OKAY;
     std::jthread worker;
+    std::shared_ptr<const lowpoly::ProcessResponse> output_response;
 
     window->set_status_text("Ready");
     window->on_browse_input([window, file_dialog_ready] {
@@ -95,7 +115,7 @@ int main()
             window->set_input_path(slint::SharedString(path));
     });
 
-    window->on_generate([window, &worker] {
+    window->on_generate([window, &worker, &output_response] {
         int point_count = 0;
         int seed = 0;
         if (!parse_integer(window->get_point_count(), &point_count) ||
@@ -124,29 +144,73 @@ int main()
         window->set_status_text("Processing...");
         window->set_is_processing(true);
 
-        worker = std::jthread([weak_window, request = std::move(request), used_seed] {
+        worker = std::jthread(
+            [weak_window, &output_response, request = std::move(request), used_seed] {
+                lowpoly::LowpolyService service;
+                lowpoly::ProcessResponse response = service.process(request);
+
+                slint::invoke_from_event_loop(
+                    [weak_window, &output_response, response = std::move(response), used_seed]() mutable {
+                        const auto window = weak_window.lock();
+                        if (!window)
+                            return;
+
+                        window.value()->set_is_processing(false);
+                        if (!response.succeeded()) {
+                            window.value()->set_status_text(
+                                process_error_message(response.status));
+                            return;
+                        }
+
+                        output_response =
+                            std::make_shared<lowpoly::ProcessResponse>(std::move(response));
+                        window.value()->set_output_image(make_image(*output_response));
+                        window.value()->set_has_output(true);
+                        const std::string status =
+                            "Generated " + std::to_string(output_response->triangle_count) +
+                            " triangles (seed: " + std::to_string(used_seed) + ")";
+                        window.value()->set_status_text(slint::SharedString(status));
+                    });
+            });
+    });
+
+    window->on_save_output([window, &worker, &output_response, file_dialog_ready] {
+        if (!file_dialog_ready) {
+            window->set_status_text("File picker is unavailable");
+            return;
+        }
+
+        if (!output_response) {
+            window->set_status_text("Generate an image first");
+            return;
+        }
+
+        std::string path;
+        if (!choose_output_file(&path))
+            return;
+
+        const auto response = output_response;
+        const auto weak_window = slint::ComponentWeakHandle<MainWindow>(window);
+        window->set_status_text("Saving...");
+        window->set_is_processing(true);
+
+        worker = std::jthread([weak_window, response, path = std::move(path)] {
             lowpoly::LowpolyService service;
-            lowpoly::ProcessResponse response = service.process(request);
+            const bool saved = service.save_png(*response, path);
 
-            slint::invoke_from_event_loop(
-                [weak_window, response = std::move(response), used_seed]() mutable {
-                    const auto window = weak_window.lock();
-                    if (!window)
-                        return;
+            slint::invoke_from_event_loop([weak_window, saved, path] {
+                const auto window = weak_window.lock();
+                if (!window)
+                    return;
 
-                    window.value()->set_is_processing(false);
-                    if (!response.succeeded()) {
-                        window.value()->set_status_text(
-                            process_error_message(response.status));
-                        return;
-                    }
-
-                    window.value()->set_output_image(make_image(response));
-                    const std::string status =
-                        "Generated " + std::to_string(response.triangle_count) +
-                        " triangles (seed: " + std::to_string(used_seed) + ")";
-                    window.value()->set_status_text(slint::SharedString(status));
-                });
+                window.value()->set_is_processing(false);
+                if (saved) {
+                    window.value()->set_status_text(
+                        slint::SharedString("Saved result to " + path));
+                } else {
+                    window.value()->set_status_text("Could not save the output image");
+                }
+            });
         });
     });
 

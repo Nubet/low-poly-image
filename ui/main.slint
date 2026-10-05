@@ -10,11 +10,13 @@ export component MainWindow inherits Window {
     in-out property <string> seed: "123";
     in-out property <bool> use-fixed-seed: false;
     in-out property <bool> is-processing: false;
+    in property <bool> has-output: false;
     in property <string> status-text: "Ready";
     in property <image> output-image;
 
     callback generate();
     callback browse-input();
+    callback save-output();
 
     HorizontalBox {
         padding: 24px;
@@ -79,6 +81,12 @@ export component MainWindow inherits Window {
                 text: "Generate";
                 enabled: !root.is-processing;
                 clicked => { root.generate(); }
+            }
+
+            Button {
+                text: "Save result...";
+                enabled: root.has-output && !root.is-processing;
+                clicked => { root.save-output(); }
             }
 
             Text {

@@ -39,3 +39,27 @@ TEST(LowpolyService, MapsInvalidRequestStatus)
     EXPECT_EQ(response.status, lowpoly::ProcessStatus::invalid_request);
     EXPECT_TRUE(response.rgb_pixels.empty());
 }
+
+TEST(LowpolyService, SavesOwnedRgbImageAsPng)
+{
+    const std::string input_path =
+        (std::filesystem::path(LOWPOLY_TEST_IMAGE_DIR) / "10136-00.jpg").string();
+    const std::filesystem::path output_path =
+        std::filesystem::temp_directory_path() / "lowpoly_service_test.png";
+    std::error_code error;
+    std::filesystem::remove(output_path, error);
+
+    lowpoly::LowpolyService service;
+    lowpoly::ProcessRequest request = {
+        .input_path = input_path,
+        .point_count = 20,
+        .seed = 123,
+    };
+    const lowpoly::ProcessResponse response = service.process(request);
+
+    ASSERT_TRUE(response.succeeded());
+    EXPECT_TRUE(service.save_png(response, output_path.string()));
+    EXPECT_TRUE(std::filesystem::exists(output_path));
+
+    std::filesystem::remove(output_path, error);
+}

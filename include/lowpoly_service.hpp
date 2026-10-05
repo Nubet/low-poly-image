@@ -33,6 +33,7 @@ struct ProcessResponse {
 class LowpolyService {
 public:
     ProcessResponse process(const ProcessRequest &request) const;
+    bool save_png(const ProcessResponse &response, const std::string &path) const;
 };
 
 } // namespace lowpoly
