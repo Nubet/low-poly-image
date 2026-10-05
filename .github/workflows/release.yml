@@ -85,8 +85,9 @@ jobs:
 
       - name: Create AppImage metadata
         run: |
-          mkdir -p AppDir/usr/bin
+          mkdir -p AppDir/usr/bin AppDir/usr/share/icons/hicolor/scalable/apps
           cp packaging/lowpoly.desktop AppDir/lowpoly.desktop
+          cp packaging/lowpoly.svg AppDir/usr/share/icons/hicolor/scalable/apps/lowpoly.svg
           cp build/lowpoly_gui AppDir/usr/bin/lowpoly_gui
           cp build/lowpoly AppDir/usr/bin/lowpoly
           cp README.md AppDir/README.md
