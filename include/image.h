@@ -4,9 +4,11 @@
 #include "arena.h"
 #include "types.h"
 
+#define LOWPOLY_MAX_IMAGE_PIXELS ((size_t)100000000)
+
 Image image_create_in_arena(Arena *arena, int width, int height);
-Image image_load_from_file(Arena *arena, const char *filename);
-void image_save_as_png(const Image *image, const char *filename);
+int image_load_from_file(Arena *arena, const char *filename, Image *out_image);
+int image_save_as_png(const Image *image, const char *filename);
 Pixel *image_pixel_at(Image *image, int x, int y);
 const Pixel *image_pixel_at_const(const Image *image, int x, int y);
 

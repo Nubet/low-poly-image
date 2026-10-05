@@ -7,7 +7,12 @@ typedef struct {
     uint8_t r, g, b;
 } Pixel;
 
+// Keep this shared C header compatible with the C++ GoogleTest target
+#ifdef __cplusplus
+static_assert(sizeof(Pixel) == 3, "Pixel must contain packed RGB data");
+#else
 _Static_assert(sizeof(Pixel) == 3, "Pixel must contain packed RGB data");
+#endif
 
 typedef struct {
     int width;

@@ -62,6 +62,10 @@ typedef struct {
     size_t count;
 } Arena_Mark;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef ARENA_REGION_DEFAULT_CAPACITY
 #define ARENA_REGION_DEFAULT_CAPACITY (8 * 1024)
 #endif // ARENA_REGION_DEFAULT_CAPACITY
@@ -84,6 +88,10 @@ void arena_reset(Arena *a);
 void arena_rewind(Arena *a, Arena_Mark m);
 void arena_free(Arena *a);
 void arena_trim(Arena *a);
+
+#ifdef __cplusplus
+}
+#endif
 
 #ifndef ARENA_DA_INIT_CAP
 #define ARENA_DA_INIT_CAP 256

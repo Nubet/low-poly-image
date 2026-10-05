@@ -2,7 +2,7 @@
 
 #include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include <limits.h>
 
 #include "geometry.h"
 
@@ -41,7 +41,8 @@ static int is_point_inside_circumcircle(Point a, Point b, Point c, Point p)
     return determinant > 0.0;
 }
 
-Point *generate_random_points_with_corners(Arena *arena, int width, int height, int requested_count)
+Point *generate_random_points_with_corners(Arena *arena, int width, int height, int requested_count,
+                                           Random *random)
 {
     Point *points = arena_alloc(arena, sizeof(Point) * (requested_count + 3));
 
@@ -51,8 +52,8 @@ Point *generate_random_points_with_corners(Arena *arena, int width, int height, 
     points[3] = (Point){0, height - 1};
 
     for (int i = 4; i < requested_count; i++) {
-        points[i].x = rand() % width;
-        points[i].y = rand() % height;
+        points[i].x = random_range(random, width);
+        points[i].y = random_range(random, height);
     }
 
     return points;
@@ -88,6 +89,11 @@ Triangle *build_delaunay_triangulation(Arena *arena, Point *points, int real_poi
     points[s1] = (Point){center_x - 20.0 * diameter, center_y + 20.0 * diameter};
     points[s2] = (Point){center_x + 20.0 * diameter, center_y + 20.0 * diameter};
 
+    if (real_point_count > (INT_MAX - 100) / 10) {
+        fprintf(stderr, "too many points for triangulation\n");
+        return NULL;
+    }
+
     int triangle_capacity = real_point_count * 10 + 100;
     Triangle *triangles = arena_alloc(arena, sizeof(Triangle) * triangle_capacity);
     int triangle_count = 1;
@@ -117,7 +123,7 @@ Triangle *build_delaunay_triangulation(Arena *arena, Point *points, int real_poi
         for (int i = 0; i < polygon_count; i++) {
             if (triangle_count >= triangle_capacity) {
                 fprintf(stderr, "triangle capacity exceeded\n");
-                exit(1);
+                return NULL;
             }
 
             triangles[triangle_count++] =
