@@ -115,6 +115,10 @@ if(LOWPOLY_BUILD_GUI)
 
     if(WIN32)
         target_link_libraries(lowpoly_gui PRIVATE imm32 uxtheme)
+    elseif(UNIX AND NOT APPLE)
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(FONTCONFIG REQUIRED IMPORTED_TARGET fontconfig)
+        target_link_libraries(lowpoly_gui PRIVATE PkgConfig::FONTCONFIG)
     endif()
 endif()
 
