@@ -1,4 +1,4 @@
-# Lowpoly
+# Lowpoly Image Generator
 
 ## Requirements
 
@@ -52,6 +52,32 @@ dependencies.
 
 The GUI workflow is: choose an input image, set the point count and seed mode,
 generate the preview, then use `Save result...` to export the result as PNG or JPEG.
+
+## Releases
+
+Tagged releases are built by GitHub Actions for Windows and Linux. Download the
+Windows ZIP or Linux AppImage from the GitHub Releases page.
+
+Release artifacts are named:
+
+```text
+lowpoly-image-generator-windows-x86_64.zip
+lowpoly-image-generator-linux-x86_64.AppImage
+```
+
+Create a release build by pushing a semantic version tag:
+
+```sh
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The Linux AppImage may require a desktop portal or GTK runtime provided by the
+distribution. The Windows ZIP is intended to run without a separate build
+environment.
+
+The project is released under the MIT License. Third-party dependency licenses
+are listed in `THIRD_PARTY_NOTICES.md`.
 
 ## Tests
 

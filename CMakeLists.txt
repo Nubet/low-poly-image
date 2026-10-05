@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(lowpoly C CXX)
+project(lowpoly-image-generator VERSION 0.1.0 LANGUAGES C CXX)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 20)
@@ -60,7 +60,11 @@ FetchContent_Declare(
     URL https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+if(MSVC AND CMAKE_MSVC_RUNTIME_LIBRARY MATCHES "^MultiThreaded")
+    set(gtest_force_shared_crt OFF CACHE BOOL "" FORCE)
+else()
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+endif()
 FetchContent_MakeAvailable(googletest)
 
 include(GoogleTest)
