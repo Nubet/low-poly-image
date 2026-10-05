@@ -148,9 +148,12 @@ int main()
             [weak_window, &output_response, request = std::move(request), used_seed] {
                 lowpoly::LowpolyService service;
                 lowpoly::ProcessResponse response = service.process(request);
+                slint::Image original_image = slint::Image::load_from_path(
+                    slint::SharedString(request.input_path));
 
                 slint::invoke_from_event_loop(
-                    [weak_window, &output_response, response = std::move(response), used_seed]() mutable {
+                    [weak_window, &output_response, original_image = std::move(original_image),
+                        response = std::move(response), used_seed]() mutable {
                         const auto window = weak_window.lock();
                         if (!window)
                             return;
@@ -164,6 +167,7 @@ int main()
 
                         output_response =
                             std::make_shared<lowpoly::ProcessResponse>(std::move(response));
+                        window.value()->set_original_image(std::move(original_image));
                         window.value()->set_output_image(make_image(*output_response));
                         window.value()->set_has_output(true);
                         const std::string status =

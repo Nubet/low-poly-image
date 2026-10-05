@@ -1,4 +1,4 @@
-import { Button, CheckBox, HorizontalBox, LineEdit, VerticalBox } from "std-widgets.slint";
+import { Button, CheckBox, ComboBox, HorizontalBox, LineEdit, VerticalBox } from "std-widgets.slint";
 
 export component MainWindow inherits Window {
     width: 1000px;
@@ -11,6 +11,8 @@ export component MainWindow inherits Window {
     in-out property <bool> use-fixed-seed: false;
     in-out property <bool> is-processing: false;
     in property <bool> has-output: false;
+    in-out property <string> preview-mode: "Low-poly result";
+    in property <image> original-image;
     in property <string> status-text: "Ready";
     in property <image> output-image;
 
@@ -89,6 +91,12 @@ export component MainWindow inherits Window {
                 clicked => { root.save-output(); }
             }
 
+            ComboBox {
+                model: ["Low-poly result", "Original"];
+                current-value <=> root.preview-mode;
+                enabled: root.has-output && !root.is-processing;
+            }
+
             Text {
                 text: root.status-text;
             }
@@ -101,7 +109,14 @@ export component MainWindow inherits Window {
             vertical-stretch: 1;
             background: #20242b;
 
-            Image {
+            if root.preview-mode == "Original": Image {
+                source: root.original-image;
+                width: 100%;
+                height: 100%;
+                image-fit: contain;
+            }
+
+            if root.preview-mode == "Low-poly result": Image {
                 source: root.output-image;
                 width: 100%;
                 height: 100%;
