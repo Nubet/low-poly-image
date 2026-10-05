@@ -66,7 +66,8 @@ ProcessResponse LowpolyService::process(const ProcessRequest &request) const
     return response;
 }
 
-bool LowpolyService::save_png(const ProcessResponse &response, const std::string &path) const
+bool LowpolyService::save_image(const ProcessResponse &response, const std::string &path,
+                                ImageFormat format) const
 {
     if (!response.succeeded() || response.width <= 0 || response.height <= 0 || path.empty())
         return false;
@@ -82,6 +83,9 @@ bool LowpolyService::save_png(const ProcessResponse &response, const std::string
         .pixels = reinterpret_cast<Pixel *>(
             const_cast<uint8_t *>(response.rgb_pixels.data())),
     };
+    if (format == ImageFormat::jpeg)
+        return image_save_as_jpeg(&image, path.c_str(), 95) != 0;
+
     return image_save_as_png(&image, path.c_str()) != 0;
 }
 

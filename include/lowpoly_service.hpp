@@ -20,6 +20,11 @@ enum class ProcessStatus {
     triangulation_error,
 };
 
+enum class ImageFormat {
+    png,
+    jpeg,
+};
+
 struct ProcessResponse {
     ProcessStatus status = ProcessStatus::invalid_request;
     int width = 0;
@@ -33,7 +38,8 @@ struct ProcessResponse {
 class LowpolyService {
 public:
     ProcessResponse process(const ProcessRequest &request) const;
-    bool save_png(const ProcessResponse &response, const std::string &path) const;
+    bool save_image(const ProcessResponse &response, const std::string &path,
+                    ImageFormat format) const;
 };
 
 } // namespace lowpoly

@@ -51,7 +51,7 @@ The regular backend, CLI, and tests do not require Rust or the GUI file-picker
 dependencies.
 
 The GUI workflow is: choose an input image, set the point count and seed mode,
-generate the preview, then use `Save result...` to export the result as PNG.
+generate the preview, then use `Save result...` to export the result as PNG or JPEG.
 
 ## Tests
 

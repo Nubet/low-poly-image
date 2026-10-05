@@ -77,3 +77,13 @@ int image_save_as_png(const Image *image, const char *filename)
 
     return 1;
 }
+
+int image_save_as_jpeg(const Image *image, const char *filename, int quality)
+{
+    if (!stbi_write_jpg(filename, image->width, image->height, 3, image->pixels, quality)) {
+        fprintf(stderr, "could not save %s\n", filename);
+        return 0;
+    }
+
+    return 1;
+}

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cctype>
 #include <cstdint>
 #include <memory>
 #include <random>
@@ -33,6 +34,20 @@ uint32_t generate_random_seed()
 {
     std::random_device random_device;
     return random_device();
+}
+
+lowpoly::ImageFormat image_format_for_path(const std::string &path)
+{
+    const size_t extension_start = path.find_last_of('.');
+    if (extension_start != std::string::npos) {
+        std::string extension = path.substr(extension_start + 1);
+        std::transform(extension.begin(), extension.end(), extension.begin(),
+                       [](unsigned char character) { return static_cast<char>(std::tolower(character)); });
+        if (extension == "jpg" || extension == "jpeg")
+            return lowpoly::ImageFormat::jpeg;
+    }
+
+    return lowpoly::ImageFormat::png;
 }
 
 const char *process_error_message(lowpoly::ProcessStatus status)
@@ -71,10 +86,13 @@ bool choose_input_file(std::string *path)
 bool choose_output_file(std::string *path)
 {
     nfdu8char_t *selected_path = nullptr;
-    nfdu8filteritem_t filters[] = {{"PNG image", "png"}};
+    nfdu8filteritem_t filters[] = {
+        {"PNG image", "png"},
+        {"JPEG image", "jpg,jpeg"},
+    };
     nfdsavedialogu8args_t arguments = {};
     arguments.filterList = filters;
-    arguments.filterCount = 1;
+    arguments.filterCount = 2;
     arguments.defaultName = "lowpoly.png";
 
     const nfdresult_t result = NFD_SaveDialogU8_With(&selected_path, &arguments);
@@ -200,7 +218,8 @@ int main()
 
         worker = std::jthread([weak_window, response, path = std::move(path)] {
             lowpoly::LowpolyService service;
-            const bool saved = service.save_png(*response, path);
+            const bool saved = service.save_image(
+                *response, path, image_format_for_path(path));
 
             slint::invoke_from_event_loop([weak_window, saved, path] {
                 const auto window = weak_window.lock();
