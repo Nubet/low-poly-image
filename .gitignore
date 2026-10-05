@@ -30,3 +30,6 @@ Release/
 # Root-level image files are local inputs/outputs, not repository assets.
 /*.png
 output.ppm
+
+# Generated low-poly dataset outputs
+/test_images/out/
