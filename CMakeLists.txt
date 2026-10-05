@@ -5,6 +5,8 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+option(LOWPOLY_BUILD_GUI "Build the Slint GUI" OFF)
+
 set(STB_INCLUDE_DIR "${CMAKE_BINARY_DIR}/generated/stb")
 file(MAKE_DIRECTORY "${STB_INCLUDE_DIR}")
 
@@ -78,6 +80,30 @@ target_compile_definitions(lowpoly_tests PRIVATE
 )
 target_link_libraries(lowpoly_tests PRIVATE lowpoly_application GTest::gtest GTest::gtest_main)
 gtest_discover_tests(lowpoly_tests)
+
+if(LOWPOLY_BUILD_GUI)
+    FetchContent_Declare(
+        Slint
+        GIT_REPOSITORY https://github.com/slint-ui/slint.git
+        GIT_TAG v1.18.1
+        SOURCE_SUBDIR api/cpp
+    )
+    FetchContent_MakeAvailable(Slint)
+
+    add_executable(lowpoly_gui src/gui/main.cpp)
+    slint_target_sources(lowpoly_gui ui/main.slint)
+    target_link_libraries(lowpoly_gui PRIVATE lowpoly_application Slint::Slint)
+
+    if(WIN32)
+        add_custom_command(
+            TARGET lowpoly_gui
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:lowpoly_gui>
+                    $<TARGET_FILE_DIR:lowpoly_gui>
+            COMMAND_EXPAND_LISTS
+        )
+    endif()
+endif()
 
 add_custom_target(run
     COMMAND ${CMAKE_COMMAND}

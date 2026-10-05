@@ -1,0 +1,75 @@
+import { Button, HorizontalBox, LineEdit, VerticalBox } from "std-widgets.slint";
+
+export component MainWindow inherits Window {
+    width: 1000px;
+    height: 700px;
+    title: "Lowpoly";
+
+    in-out property <string> input-path;
+    in-out property <string> point-count: "500";
+    in-out property <string> seed: "123";
+    in property <string> status-text: "Ready";
+    in property <image> output-image;
+
+    callback generate();
+
+    HorizontalBox {
+        padding: 24px;
+        spacing: 24px;
+
+        VerticalBox {
+            width: 320px;
+            spacing: 12px;
+
+            Text {
+                text: "Lowpoly generator";
+                font-size: 26px;
+            }
+
+            Text {
+                text: "Input image";
+            }
+
+            LineEdit {
+                text <=> root.input-path;
+                placeholder-text: "Path to an image";
+            }
+
+            Text {
+                text: "Points";
+            }
+
+            LineEdit {
+                text <=> root.point-count;
+            }
+
+            Text {
+                text: "Seed";
+            }
+
+            LineEdit {
+                text <=> root.seed;
+            }
+
+            Button {
+                text: "Generate";
+                clicked => { root.generate(); }
+            }
+
+            Text {
+                text: root.status-text;
+            }
+
+            Rectangle { vertical-stretch: 1; }
+        }
+
+        Rectangle {
+            horizontal-stretch: 1;
+            background: #20242b;
+
+            Image {
+                source: root.output-image;
+            }
+        }
+    }
+}

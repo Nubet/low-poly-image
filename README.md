@@ -17,6 +17,37 @@ cmake --build .
 The test target uses GoogleTest 1.17.0 and is downloaded by CMake during
 configuration.
 
+## GUI
+
+The optional GUI uses Slint 1.18.1 and is disabled by default. Building it
+from source requires a Rust toolchain in addition to CMake and a C++20
+compiler.
+
+Install Rust on Windows if it is not available:
+
+```powershell
+winget install --id Rustlang.Rustup -e --source winget
+```
+
+Configure and build the GUI:
+
+```sh
+cmake -S . -B build-gui -DLOWPOLY_BUILD_GUI=ON
+cmake --build build-gui --target lowpoly_gui
+```
+
+Run the GUI locally from the project root:
+
+```powershell
+.\build-gui\lowpoly_gui.exe
+```
+
+The Slint runtime DLL is copied next to the executable during the build.
+The GUI accepts an input image path, point count, and seed, then displays the
+generated result in the window.
+
+The regular backend, CLI, and tests do not require Rust.
+
 ## Tests
 
 ```sh
