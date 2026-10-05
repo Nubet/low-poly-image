@@ -9,6 +9,7 @@ export component MainWindow inherits Window {
     in-out property <string> point-count: "500";
     in-out property <string> seed: "123";
     in-out property <bool> use-fixed-seed: false;
+    in-out property <bool> is-processing: false;
     in property <string> status-text: "Ready";
     in property <image> output-image;
 
@@ -40,6 +41,7 @@ export component MainWindow inherits Window {
 
                     Button {
                         text: "Choose image...";
+                        enabled: !root.is-processing;
                         clicked => { root.browse-input(); }
                     }
 
@@ -55,6 +57,7 @@ export component MainWindow inherits Window {
 
             LineEdit {
                 text <=> root.point-count;
+                enabled: !root.is-processing;
             }
 
             Text {
@@ -63,16 +66,18 @@ export component MainWindow inherits Window {
 
             LineEdit {
                 text <=> root.seed;
-                enabled: root.use-fixed-seed;
+                enabled: root.use-fixed-seed && !root.is-processing;
             }
 
             CheckBox {
                 text: "Use fixed seed";
                 checked <=> root.use-fixed-seed;
+                enabled: !root.is-processing;
             }
 
             Button {
                 text: "Generate";
+                enabled: !root.is-processing;
                 clicked => { root.generate(); }
             }
 
@@ -85,10 +90,14 @@ export component MainWindow inherits Window {
 
         Rectangle {
             horizontal-stretch: 1;
+            vertical-stretch: 1;
             background: #20242b;
 
             Image {
                 source: root.output-image;
+                width: 100%;
+                height: 100%;
+                image-fit: contain;
             }
         }
     }
