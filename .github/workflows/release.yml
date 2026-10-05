@@ -20,10 +20,19 @@ jobs:
       - name: Set up MSVC
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Prefer MSVC linker for Rust
+      - name: Configure MSVC linker for Rust
         shell: pwsh
         run: |
-          "$env:VCToolsInstallDir\bin\Hostx64\x64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
+          $vsPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          $msvcTools = Get-ChildItem (Join-Path $vsPath 'VC/Tools/MSVC') -Directory |
+            Sort-Object Name -Descending | Select-Object -First 1
+          $linker = Join-Path $msvcTools.FullName 'bin/Hostx64/x64/link.exe'
+          if (-not (Test-Path $linker)) {
+            throw "MSVC linker was not found at $linker"
+          }
+          "CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER=$linker" |
+            Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
