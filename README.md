@@ -1,5 +1,17 @@
 # Lowpoly Image Generator
 
+## Showcase
+
+Same input image rendered with different point counts:
+
+| Original | 500 points | 1000 points |
+| --- | --- | --- |
+| ![Original](docs/images/orginal.png) | ![500 points](docs/images/500.png) | ![1000 points](docs/images/1000.png) |
+
+| 2000 points | 5000 points |
+| --- | --- |
+| ![2000 points](docs/images/2000.png) | ![5000 points](docs/images/5000.png) |
+
 ## Requirements
 
 - C compiler
