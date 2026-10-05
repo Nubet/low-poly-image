@@ -1,4 +1,4 @@
-import { Button, HorizontalBox, LineEdit, VerticalBox } from "std-widgets.slint";
+import { Button, CheckBox, HorizontalBox, LineEdit, VerticalBox } from "std-widgets.slint";
 
 export component MainWindow inherits Window {
     width: 1000px;
@@ -8,6 +8,7 @@ export component MainWindow inherits Window {
     in-out property <string> input-path;
     in-out property <string> point-count: "500";
     in-out property <string> seed: "123";
+    in-out property <bool> use-fixed-seed: false;
     in property <string> status-text: "Ready";
     in property <image> output-image;
 
@@ -49,6 +50,12 @@ export component MainWindow inherits Window {
 
             LineEdit {
                 text <=> root.seed;
+                enabled: root.use-fixed-seed;
+            }
+
+            CheckBox {
+                text: "Use fixed seed";
+                checked <=> root.use-fixed-seed;
             }
 
             Button {

@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cstdint>
+#include <random>
 #include <string>
 #include <utility>
 
@@ -25,6 +26,12 @@ bool parse_integer(const slint::SharedString &text, int *value)
     }
 }
 
+uint32_t generate_random_seed()
+{
+    std::random_device random_device;
+    return random_device();
+}
+
 slint::Image make_image(const lowpoly::ProcessResponse &response)
 {
     slint::SharedPixelBuffer<slint::Rgb8Pixel> buffer(response.width, response.height);
@@ -45,16 +52,21 @@ int main()
         int point_count = 0;
         int seed = 0;
         if (!parse_integer(window->get_point_count(), &point_count) ||
-            !parse_integer(window->get_seed(), &seed)) {
-            window->set_status_text("Points and seed must be integers");
+            (window->get_use_fixed_seed() && !parse_integer(window->get_seed(), &seed))) {
+            window->set_status_text("Points and seed must be valid integers");
             return;
         }
+
+        const uint32_t used_seed = window->get_use_fixed_seed()
+            ? static_cast<uint32_t>(seed)
+            : generate_random_seed();
+        window->set_seed(slint::SharedString(std::to_string(used_seed)));
 
         window->set_status_text("Processing...");
         lowpoly::ProcessRequest request = {
             .input_path = std::string(window->get_input_path().data()),
             .point_count = point_count,
-            .seed = static_cast<uint32_t>(seed),
+            .seed = used_seed,
         };
         lowpoly::ProcessResponse response = service.process(request);
 
@@ -65,7 +77,8 @@ int main()
 
         window->set_output_image(make_image(response));
         const std::string status =
-            "Generated " + std::to_string(response.triangle_count) + " triangles";
+            "Generated " + std::to_string(response.triangle_count) +
+            " triangles (seed: " + std::to_string(used_seed) + ")";
         window->set_status_text(slint::SharedString(status));
     });
 
