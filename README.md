@@ -76,8 +76,7 @@ The Linux AppImage may require a desktop portal or GTK runtime provided by the
 distribution. The Windows ZIP is intended to run without a separate build
 environment.
 
-The project is released under the MIT License. Third-party dependency licenses
-are listed in `THIRD_PARTY_NOTICES.md`.
+The project is released under the MIT License.
 
 ## Tests
 
