@@ -13,6 +13,7 @@ export component MainWindow inherits Window {
     in property <image> output-image;
 
     callback generate();
+    callback browse-input();
 
     HorizontalBox {
         padding: 24px;
@@ -31,9 +32,21 @@ export component MainWindow inherits Window {
                 text: "Input image";
             }
 
-            LineEdit {
-                text <=> root.input-path;
-                placeholder-text: "Path to an image";
+            HorizontalBox {
+                spacing: 8px;
+
+                VerticalBox {
+                    spacing: 6px;
+
+                    Button {
+                        text: "Choose image...";
+                        clicked => { root.browse-input(); }
+                    }
+
+                    Text {
+                        text: root.input-path == "" ? "No image selected" : root.input-path;
+                    }
+                }
             }
 
             Text {

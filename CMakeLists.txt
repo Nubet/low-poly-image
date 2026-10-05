@@ -4,6 +4,7 @@ set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build project libraries as static libraries" FORCE)
 
 option(LOWPOLY_BUILD_GUI "Build the Slint GUI" OFF)
 
@@ -90,18 +91,21 @@ if(LOWPOLY_BUILD_GUI)
     )
     FetchContent_MakeAvailable(Slint)
 
+    FetchContent_Declare(
+        nativefiledialog_extended
+        GIT_REPOSITORY https://github.com/btzy/nativefiledialog-extended.git
+        GIT_TAG v1.4.1
+    )
+    set(NFD_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(NFD_INSTALL OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(nativefiledialog_extended)
+
     add_executable(lowpoly_gui src/gui/main.cpp)
     slint_target_sources(lowpoly_gui ui/main.slint)
-    target_link_libraries(lowpoly_gui PRIVATE lowpoly_application Slint::Slint)
+    target_link_libraries(lowpoly_gui PRIVATE lowpoly_application Slint::Slint nfd)
 
     if(WIN32)
-        add_custom_command(
-            TARGET lowpoly_gui
-            POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:lowpoly_gui>
-                    $<TARGET_FILE_DIR:lowpoly_gui>
-            COMMAND_EXPAND_LISTS
-        )
+        target_link_libraries(lowpoly_gui PRIVATE imm32 uxtheme)
     endif()
 endif()
 

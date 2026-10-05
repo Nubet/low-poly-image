@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 
+#include <nfd.h>
 #include <slint.h>
 
 #include "lowpoly_service.hpp"
@@ -32,6 +33,23 @@ uint32_t generate_random_seed()
     return random_device();
 }
 
+bool choose_input_file(std::string *path)
+{
+    nfdu8char_t *selected_path = nullptr;
+    nfdu8filteritem_t filters[] = {{"Image files", "png,jpg,jpeg,bmp"}};
+    nfdopendialogu8args_t arguments = {};
+    arguments.filterList = filters;
+    arguments.filterCount = 1;
+
+    const nfdresult_t result = NFD_OpenDialogU8_With(&selected_path, &arguments);
+    if (result != NFD_OKAY)
+        return false;
+
+    *path = selected_path;
+    NFD_FreePathU8(selected_path);
+    return true;
+}
+
 slint::Image make_image(const lowpoly::ProcessResponse &response)
 {
     slint::SharedPixelBuffer<slint::Rgb8Pixel> buffer(response.width, response.height);
@@ -46,8 +64,20 @@ int main()
 {
     auto window = MainWindow::create();
     lowpoly::LowpolyService service;
+    const bool file_dialog_ready = NFD_Init() == NFD_OKAY;
 
     window->set_status_text("Ready");
+    window->on_browse_input([window, file_dialog_ready] {
+        if (!file_dialog_ready) {
+            window->set_status_text("File picker is unavailable");
+            return;
+        }
+
+        std::string path;
+        if (choose_input_file(&path))
+            window->set_input_path(slint::SharedString(path));
+    });
+
     window->on_generate([window, &service] {
         int point_count = 0;
         int seed = 0;
@@ -83,5 +113,7 @@ int main()
     });
 
     window->run();
+    if (file_dialog_ready)
+        NFD_Quit();
     return 0;
 }
