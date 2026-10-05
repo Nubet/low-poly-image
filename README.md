@@ -17,6 +17,14 @@ Same input image rendered with different point counts:
 - C compiler
 - CMake
 
+## Documentation
+
+- [Architecture](docs/architecture.md)
+- [Data flow](docs/data-flow.md)
+- [Algorithm](docs/algorithm.md)
+- [GUI](docs/gui.md)
+- [Build system](docs/build-system.md)
+
 ## Build
 
 ```sh
