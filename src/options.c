@@ -7,7 +7,6 @@
 #include <string.h>
 
 #define DEFAULT_POINT_COUNT 500
-#define MIN_POINT_COUNT 4
 
 static int parse_unsigned(const char *text, unsigned int *value)
 {
@@ -30,7 +29,7 @@ static int parse_point_count(const char *text, int *value)
 {
     unsigned int parsed;
 
-    if (!parse_unsigned(text, &parsed) || parsed < MIN_POINT_COUNT ||
+    if (!parse_unsigned(text, &parsed) || parsed < LOWPOLY_MIN_POINT_COUNT ||
         parsed > LOWPOLY_MAX_POINT_COUNT)
         return 0;
 
@@ -91,7 +90,8 @@ int options_parse(Arena *arena, int argc, char **argv, Options *options)
             options->output_path = argv[i];
         } else if (strcmp(argument, "--points") == 0) {
             if (++i >= argc || !parse_point_count(argv[i], &options->point_count)) {
-                fprintf(stderr, "points must be an integer between %d and %d\n", MIN_POINT_COUNT,
+                fprintf(stderr, "points must be an integer between %d and %d\n",
+                        LOWPOLY_MIN_POINT_COUNT,
                         LOWPOLY_MAX_POINT_COUNT);
                 return -1;
             }

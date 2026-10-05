@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)
 project(lowpoly C CXX)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -22,22 +22,29 @@ file(
     EXPECTED_HASH SHA256=cbd5f0ad7a9cf4468affb36354a1d2338034f2c12473cf1a8e32053cb6914a05
 )
 
-add_executable(
-    lowpoly
+set(LOWPOLY_CORE_SOURCES
     src/dependencies.c
     src/geometry.c
     src/image.c
-    src/main.c
-    src/options.c
+    src/processing.c
     src/random.c
     src/renderer.c
     src/triangulation.c
 )
-target_compile_options(lowpoly PRIVATE -O2 -Wall -Wextra)
-target_include_directories(lowpoly PRIVATE "${CMAKE_SOURCE_DIR}/include" "${STB_INCLUDE_DIR}")
+
+add_library(lowpoly_core STATIC ${LOWPOLY_CORE_SOURCES})
+target_compile_options(lowpoly_core PRIVATE -O2 -Wall -Wextra)
+target_include_directories(lowpoly_core PUBLIC "${CMAKE_SOURCE_DIR}/include" "${STB_INCLUDE_DIR}")
 if(NOT WIN32)
-    target_link_libraries(lowpoly PRIVATE m)
+    target_link_libraries(lowpoly_core PUBLIC m)
 endif()
+
+add_executable(lowpoly
+    src/main.c
+    src/options.c
+)
+target_compile_options(lowpoly PRIVATE -Wall -Wextra)
+target_link_libraries(lowpoly PRIVATE lowpoly_core)
 
 enable_testing()
 include(FetchContent)
@@ -55,25 +62,16 @@ add_executable(lowpoly_tests
     tests/geometry_test.cpp
     tests/image_test.cpp
     tests/options_test.cpp
+    tests/processing_test.cpp
     tests/random_test.cpp
     tests/renderer_test.cpp
     tests/triangulation_test.cpp
-    src/dependencies.c
-    src/geometry.c
-    src/image.c
     src/options.c
-    src/random.c
-    src/renderer.c
-    src/triangulation.c
 )
-target_include_directories(lowpoly_tests PRIVATE "${CMAKE_SOURCE_DIR}/include" "${STB_INCLUDE_DIR}")
 target_compile_definitions(lowpoly_tests PRIVATE
     LOWPOLY_TEST_IMAGE_DIR="${CMAKE_SOURCE_DIR}/test_images/in"
 )
-target_link_libraries(lowpoly_tests PRIVATE GTest::gtest GTest::gtest_main)
-if(NOT WIN32)
-    target_link_libraries(lowpoly_tests PRIVATE m)
-endif()
+target_link_libraries(lowpoly_tests PRIVATE lowpoly_core GTest::gtest GTest::gtest_main)
 gtest_discover_tests(lowpoly_tests)
 
 add_custom_target(run

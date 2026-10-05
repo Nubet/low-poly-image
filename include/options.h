@@ -2,8 +2,7 @@
 #define LOWPOLY_OPTIONS_H
 
 #include "arena.h"
-
-#define LOWPOLY_MAX_POINT_COUNT 1000000
+#include "lowpoly_limits.h"
 
 #ifdef __cplusplus
 extern "C" {
