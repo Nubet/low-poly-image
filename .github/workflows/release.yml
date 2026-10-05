@@ -5,6 +5,9 @@ on:
     tags:
       - "v*.*.*"
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: write
 
@@ -15,10 +18,10 @@ jobs:
 
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up MSVC
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: ilammy/msvc-dev-cmd@v1.13.0
 
       - name: Configure MSVC linker for Rust
         shell: pwsh
@@ -64,7 +67,7 @@ jobs:
           Compress-Archive -Path package/* -DestinationPath lowpoly-image-generator-windows-x86_64.zip -Force
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lowpoly-image-generator-windows-x86_64
           path: lowpoly-image-generator-windows-x86_64.zip
@@ -75,7 +78,7 @@ jobs:
 
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libfontconfig1-dev libgtk-3-dev
@@ -119,7 +122,7 @@ jobs:
           chmod +x lowpoly-image-generator-linux-x86_64.AppImage
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lowpoly-image-generator-linux-x86_64
           path: lowpoly-image-generator-linux-x86_64.AppImage
@@ -131,12 +134,12 @@ jobs:
 
     steps:
       - name: Download Windows artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: lowpoly-image-generator-windows-x86_64
 
       - name: Download Linux artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: lowpoly-image-generator-linux-x86_64
 
