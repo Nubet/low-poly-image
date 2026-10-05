@@ -36,7 +36,12 @@ set(LOWPOLY_CORE_SOURCES
 )
 
 add_library(lowpoly_core STATIC ${LOWPOLY_CORE_SOURCES})
-target_compile_options(lowpoly_core PRIVATE -O2 -Wall -Wextra)
+if(MSVC)
+    set(LOWPOLY_WARNING_FLAGS /W4)
+else()
+    set(LOWPOLY_WARNING_FLAGS -Wall -Wextra)
+endif()
+target_compile_options(lowpoly_core PRIVATE -O2 ${LOWPOLY_WARNING_FLAGS})
 target_include_directories(lowpoly_core PUBLIC "${CMAKE_SOURCE_DIR}/include" "${STB_INCLUDE_DIR}")
 if(NOT WIN32)
     target_link_libraries(lowpoly_core PUBLIC m)
@@ -50,7 +55,7 @@ add_executable(lowpoly
     src/main.c
     src/options.c
 )
-target_compile_options(lowpoly PRIVATE -Wall -Wextra)
+target_compile_options(lowpoly PRIVATE ${LOWPOLY_WARNING_FLAGS})
 target_link_libraries(lowpoly PRIVATE lowpoly_core)
 
 enable_testing()
