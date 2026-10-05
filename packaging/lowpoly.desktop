@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Lowpoly Image Generator
+Comment=Generate low-poly images
+Exec=lowpoly_gui
+Categories=Graphics;Photography;
