@@ -19,15 +19,20 @@ configuration.
 
 ## GUI
 
-The optional GUI uses Slint 1.18.1 and is disabled by default. Building it
-from source requires a Rust toolchain in addition to CMake and a C++20
-compiler.
+The optional GUI uses Slint 1.18.1 and nativefiledialog-extended 1.4.1. It is
+disabled by default. Building it from source requires a Rust toolchain in
+addition to CMake and a C++20 compiler. The file picker uses the native dialog
+of the current operating system on Windows, macOS, and Linux.
 
-Install Rust on Windows if it is not available:
+Install Rust if it is not available. On Windows:
 
 ```powershell
 winget install --id Rustlang.Rustup -e --source winget
 ```
+
+On Linux, the file picker uses GTK3 by default, so install the development
+package provided by your distribution, for example `libgtk-3-dev` on Debian or
+Ubuntu. The picker can use desktop portals instead with `-DNFD_PORTAL=ON`.
 
 Configure and build the GUI:
 
@@ -36,17 +41,14 @@ cmake -S . -B build-gui -DLOWPOLY_BUILD_GUI=ON
 cmake --build build-gui --target lowpoly_gui
 ```
 
-Run the GUI locally from the project root:
+Run the GUI locally from the project root on Windows:
 
 ```powershell
 .\build-gui\lowpoly_gui.exe
 ```
 
-The Slint runtime DLL is copied next to the executable during the build.
-The GUI accepts an input image path, point count, and seed, then displays the
-generated result in the window.
-
-The regular backend, CLI, and tests do not require Rust.
+The regular backend, CLI, and tests do not require Rust or the GUI file-picker
+dependencies.
 
 ## Tests
 
