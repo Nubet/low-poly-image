@@ -39,6 +39,10 @@ if(NOT WIN32)
     target_link_libraries(lowpoly_core PUBLIC m)
 endif()
 
+add_library(lowpoly_application STATIC src/lowpoly_service.cpp)
+target_include_directories(lowpoly_application PUBLIC "${CMAKE_SOURCE_DIR}/include")
+target_link_libraries(lowpoly_application PUBLIC lowpoly_core)
+
 add_executable(lowpoly
     src/main.c
     src/options.c
@@ -61,6 +65,7 @@ include(GoogleTest)
 add_executable(lowpoly_tests
     tests/geometry_test.cpp
     tests/image_test.cpp
+    tests/lowpoly_service_test.cpp
     tests/options_test.cpp
     tests/processing_test.cpp
     tests/random_test.cpp
@@ -71,7 +76,7 @@ add_executable(lowpoly_tests
 target_compile_definitions(lowpoly_tests PRIVATE
     LOWPOLY_TEST_IMAGE_DIR="${CMAKE_SOURCE_DIR}/test_images/in"
 )
-target_link_libraries(lowpoly_tests PRIVATE lowpoly_core GTest::gtest GTest::gtest_main)
+target_link_libraries(lowpoly_tests PRIVATE lowpoly_application GTest::gtest GTest::gtest_main)
 gtest_discover_tests(lowpoly_tests)
 
 add_custom_target(run
