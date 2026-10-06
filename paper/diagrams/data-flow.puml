@@ -1,0 +1,24 @@
+@startuml
+title Lowpoly Image Generator - Processing Pipeline
+
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam activity {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  DiamondBackgroundColor #FEF3C7
+  DiamondBorderColor #92400E
+  ArrowColor #475569
+}
+
+start
+:Read input path and parameters;
+:Load RGB image;
+:Generate corner and random points;
+:Build incremental Delaunay mesh;
+:Sample one source color per triangle;
+:Rasterize filled triangles;
+:Return owned output image;
+stop
+
+@enduml

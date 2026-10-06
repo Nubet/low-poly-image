@@ -1,0 +1,9 @@
+Seed comparison
+input=test_images\in\10136-00.jpg
+points=500
+seed_a=123
+seed_b=123
+seed_different=124
+sha256_a=4618e1d1668f2c0af1eefa02ba0617106b2b14ba3300fb58ee8bc2e3a6e9e567
+sha256_b=4618e1d1668f2c0af1eefa02ba0617106b2b14ba3300fb58ee8bc2e3a6e9e567
+sha256_different=1e362014c80db70600e4c8e2c1c7c3db71a599b9902ad927a9582c0cfd7dfa09

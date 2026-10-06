@@ -1,0 +1,28 @@
+@startuml
+title Lowpoly Image Generator - Component Structure
+
+left to right direction
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam component {
+  BackgroundColor #F5F7FA
+  BorderColor #334155
+}
+
+component "CLI\nsrc/main.c" as cli #DBEAFE
+component "Slint GUI\nmain.cpp + main.slint" as gui #E0F2FE
+component "C++ service\nlowpoly_service.cpp" as service #EDE9FE
+component "C processing core" as core #DCFCE7
+component "Image I/O\nimage.c" as image #FEF3C7
+component "Geometry and mesh\ngeometry.c + triangulation.c" as mesh #FEF3C7
+component "Rendering\nrenderer.c" as renderer #FEF3C7
+
+cli --> service : process request
+gui --> service : process / save
+service --> core : LowpolyProcessRequest
+core --> image : load / save pixels
+core --> mesh : points and triangles
+core --> renderer : mesh + pixels
+
+@enduml

@@ -1,0 +1,33 @@
+@startuml
+title Lowpoly GUI - Processing Sequence
+
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam sequence {
+  ArrowColor #475569
+  LifeLineBorderColor #64748B
+  ParticipantBorderColor #334155
+  ParticipantBackgroundColor #E0F2FE
+  ActorBorderColor #334155
+  ActorBackgroundColor #DBEAFE
+}
+
+actor User
+participant "Slint UI" as UI
+participant "GUI C++" as GUI
+participant "Worker thread" as Worker
+participant "C++ service" as Service
+participant "C core" as Core
+
+User -> UI : Click Generate
+UI -> GUI : on_generate()
+GUI -> GUI : Validate input and choose seed
+GUI -> Worker : Start std::jthread
+Worker -> Service : process(request)
+Service -> Core : lowpoly_process()
+Core --> Service : output image + status
+Service --> Worker : ProcessResponse
+Worker -> UI : invoke_from_event_loop()
+UI --> User : Show preview and status
+
+@enduml

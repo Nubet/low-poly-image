@@ -27,7 +27,7 @@ install_manifest.txt
 *.ilk
 Debug/
 Release/
-
+build-release
 # Root-level image files are local inputs/outputs, not repository assets.
 /*.png
 output.ppm

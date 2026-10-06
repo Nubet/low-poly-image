@@ -1,0 +1,31 @@
+@startuml
+title Incremental Delaunay Triangulation - High-Level Flow
+
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam activity {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  ArrowColor #475569
+  DiamondBackgroundColor #FEF3C7
+  DiamondBorderColor #92400E
+}
+
+start
+:Create super-triangle;
+:Initialize triangle list;
+while (More real points?) is (yes)
+  :Select next point;
+  :Find triangles containing point
+  in their circumcircle;
+  :Remove bad triangles;
+  :Cancel duplicate edges;
+  :Create triangles from boundary
+  edges and new point;
+endwhile (no)
+:Remove triangles touching
+super-triangle vertices;
+:Return final mesh;
+stop
+
+@enduml
