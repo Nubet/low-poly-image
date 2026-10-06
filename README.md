@@ -19,6 +19,7 @@ Same input image rendered with different point counts:
 
 ## Documentation
 
+- [Technical case study (PDF)](docs/lowpoly-image-generator-case-study.pdf)
 - [Architecture](docs/architecture.md)
 - [Data flow](docs/data-flow.md)
 - [Algorithm](docs/algorithm.md)
